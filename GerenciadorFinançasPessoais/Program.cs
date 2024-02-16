@@ -1,32 +1,58 @@
 ﻿
-
-
-
-
-
+using System.Runtime.CompilerServices;
 using System.Transactions;
+using System.Xml;
 
-namespace GerenciadorFinançasPessoais
+namespace GerenciadorFinancasPessoais
 {
     public class Program
     {
         static void Main(string[] args)
         {
+            Transacao transacao = new Transacao();
+
+            try
+            {
+                Console.Write("Digite o nome do proprietário: ");
+                string nome = Console.ReadLine();
+                transacao.Nome = nome;
+            }
+            catch (FormatException e )
+            {
+                Cor("vermelha");
+                Console.WriteLine(e.Message);
+
+                Cor("branca");
+
+                Console.WriteLine("\nPressione qualquer tecla para prosseguir");
+                Console.ReadKey();
+                return;
+            }
+
+            Cor("verde");
+            Console.WriteLine(BemVindo(transacao));
+            Cor("branca");
+
             string opcao;
 
             do
             {
                 Console.WriteLine(MostrarCabecalho());
-                Console.WriteLine(DonoConta());
                 Console.WriteLine(MostrarMenu());
 
                 opcao = LerOpcaoMenu();
-                ProcessarOpcaoMenu(opcao);
+                ProcessarOpcaoMenu(opcao, transacao.Nome);
                 PressionaTecla();
                 Console.Clear();
 
             } while (opcao != "6");
             
+        }
+
+        static string BemVindo(Transacao transacao)
+        {
+            string bv = $"BOAS VINDAS {transacao.Nome}!\n";
+            return bv;
         }
 
         static string MostrarMenu()
@@ -43,70 +69,139 @@ namespace GerenciadorFinançasPessoais
         
         static string MostrarCabecalho()
         {
-            string cabecalho = "GERENCIADOR DE FINANÇAS PESSOAIS";
+            string cabecalho = "\nGERENCIADOR DE FINANÇAS PESSOAIS";
             return cabecalho;
         }
 
         static string LerOpcaoMenu()
         {
             string opcao;
-            Console.WriteLine("Opção desejada: ");
+            Console.Write("Opção desejada: ");
             opcao = Console.ReadLine();
             return opcao;
         }
+
+        public static void Cor(string cor)
+        {
+            ConsoleColor corConsole;
+            switch (cor.ToLower())
+            {
+                case "verde":
+                    corConsole = ConsoleColor.Green;
+                    break;
+                case "branca":
+                    corConsole = ConsoleColor.White;
+                    break;
+                case "vermelha":
+                    corConsole = ConsoleColor.Red;
+                    break;
+                default:
+                    corConsole = ConsoleColor.White;
+                    break;
+            }
+            Console.ForegroundColor = corConsole;
+        }
+
 
         private static void PressionaTecla()
         {
             Console.WriteLine("Pressione qualquer tecla para prosseguir.");
             Console.ReadKey();
         }
-        static Transacao DonoConta()
-        {
-            Transacao transacao = new Transacao();
-            Console.Write("Digite seu nome: ");
-            string nome = Console.ReadLine();
+        
 
-            transacao.Nome = nome;
-            return transacao;
-        }
-
-        public static void RealizarTransacaoDespesa()
+        public static void RealizarTransacao(string nome)
         {
+            Console.Clear();
             Console.WriteLine("REALIZAR TRANSAÇÃO\n");
-            Transacao transacao = new Transacao();
+            Console.WriteLine("Tipo de transação:\n" +
+                                "1 - DESPESAS\n" +
+                                "2 - RECEITA");
 
-            transacao.Tipo = TipoTransacao.Despesa;
-            Console.Write("Digite o valor da transação: ");
+            string tipo = Console.ReadLine();
+
+            switch (tipo) 
+            {
+                case "1":
+                    RealizarTransacaoDespesas(nome);
+                    break;
+                case "2":
+                    RealizarTransacaoReceita();
+                    break;
+                default:
+                    Console.WriteLine("Opção de transação inválida!");
+                    break;
+            }
+        }
+        public static void RealizarTransacaoDespesas(string nome)
+        {
+            double valor;
+            string finalizar;
+
+            Console.Clear();
+            Console.WriteLine("=== REALIZAR TRANSAÇÃO ===\n");
+            Console.WriteLine("Tipo de Transação: Despesas\n");
+
+            Transacao despesas = new Transacao();
+            despesas.Tipo = TipoTransacao.Despesa;
+
+            Console.Write("Qual valor a ser transferido {0}? : ", nome);
             try
             {
-                transacao.Valor = double.Parse(Console.ReadLine());
+            valor = double.Parse(Console.ReadLine());
+            despesas.Valor = valor;
             }
             catch (FormatException e)
             {
-                Console.WriteLine("Ocorreu um problema {0}", e);
-                PressionaTecla();
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Pressione qualquer tecla para prosseguir");
+                Console.ReadKey();
                 return;
             }
-            Console.WriteLine("Digite");
+            Console.Write("Descrição da transação: ");
+            despesas.Descricao = Console.ReadLine();
+            
+            despesas.Data = DateTime.Now;
+
+            Console.WriteLine("1 - [CONFIRMAR]\n" +
+                            "2 - [CANCELAR]");
+            finalizar = Console.ReadLine();
+
+            switch (finalizar)
+            {
+                case "1":
+                    Console.WriteLine("Transação realizada com sucesso!");
+                    break;
+                case "2":
+                    Console.ReadKey();
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida");
+                    break;
+            }
+
+            Console.WriteLine("Pressione qualquer tecla para prosseguir");
+            Console.ReadKey();
 
         }
-
-
-        static void ProcessarOpcaoMenu(string opcao)
+        public static void RealizarTransacaoReceita()
         {
-            Transacao transacao = DonoConta();
+            
+        }
+
+        static void ProcessarOpcaoMenu(string opcao, string nome)
+        {
             switch (opcao)
             {
                 case "1":
-                    Console.WriteLine($"Ainda trabalhando nessa opção {transacao.Nome}!");
+                    RealizarTransacao(nome);
                     break;
                 case "2":
                 case "3":
                 case "4":
                 case "5":
                 case "6":
-                    Transacao donoConta = DonoConta(); 
-                    Console.WriteLine($"Ainda trabalhando nessa opção {donoConta.Nome}!");
+                    Console.WriteLine($"Ainda trabalhando nessa opção {nome}!");
                     break;
                 default:
                     Console.WriteLine("Opção de menu inválida!");

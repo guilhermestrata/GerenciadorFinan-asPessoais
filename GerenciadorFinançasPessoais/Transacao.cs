@@ -5,13 +5,14 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GerenciadorFinançasPessoais
+namespace GerenciadorFinancasPessoais
 {
     public class Transacao
     {
         private string _nome;
         private double _valor;
         private TipoTransacao _tipo;
+        private string _destinatario;
 
         public double Valor {
             get {
@@ -41,17 +42,40 @@ namespace GerenciadorFinançasPessoais
                 {
                     throw new FormatException("O nome deve conter mais do que 3 caracteres");
                 }
-
+                if (value == null)
+                {
+                    throw new FormatException("O nome deve ser apresentado");
+                }
+                _nome = value;
             }
         }
         public string Categoria { get; set; }
         public DateTime Data { get; set; }
         public string Descricao { get; set; }
         public TipoTransacao Tipo { get; set; }
+        public string Destinatario {
+            get
+            {
+                return _destinatario;
+            }
+            set
+            {
+                if (value.Length < 3)
+                {
+                    throw new FormatException("O nome deve conter mais do que 3 caracteres");
+                }
+
+            }
+        }
 
         public Transacao()
         {
             
+        }
+
+        public Transacao(string nome)
+        {
+            Nome = nome;
         }
     }
 }

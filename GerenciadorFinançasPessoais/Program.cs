@@ -46,7 +46,7 @@ namespace GerenciadorFinancasPessoais
                 Console.WriteLine(MostrarMenu());
 
                 opcao = LerOpcaoMenu();
-                ProcessarOpcaoMenu(opcao, transacao.Nome, listaDeTransacoes);
+                ProcessarOpcaoMenu(opcao, transacao.Nome, listaDeTransacoes, transacao.Saldo);
                 PressionaTecla();
                 Console.Clear();
 
@@ -185,35 +185,31 @@ namespace GerenciadorFinancasPessoais
             Console.WriteLine("Tipo de Transação: Despesas\n");
             Cor("branca");
 
-            Transacao despesas = new Transacao();
-            despesas.Tipo = TipoTransacao.Despesa;
+            transacao.Tipo = TipoTransacao.Despesa;
 
             Console.Write("Qual valor a ser transferido {0}? : ", nome);
 
             try
             {
                 valor = double.Parse(Console.ReadLine());
-                if (valor > transacao.Saldo)
-                {
-                    throw new FormatException("Sem saldo disponível");
-                }
-                despesas.Valor = valor;
-                transacao.Saldo -= valor; 
+                transacao.Valor = valor;
+                transacao.Saldo -= transacao.Valor;
             }
             catch (FormatException e)
             {
                 Console.WriteLine(e.Message);
+
                 Console.WriteLine("Pressione qualquer tecla para prosseguir");
                 Console.ReadKey();
                 return;
             }
 
             Console.Write("Descrição da transação: ");
-            despesas.Descricao = Console.ReadLine();
+            transacao.Descricao = Console.ReadLine();
 
-            despesas.Data = DateTime.Now;
+            transacao.Data = DateTime.Now;
 
-            transacoes.Add(despesas);
+            transacoes.Add(transacao);
 
             Console.WriteLine("\nConfirmar Transação:");
             Console.WriteLine("1 - [Confirmar]");
@@ -227,13 +223,13 @@ namespace GerenciadorFinancasPessoais
                     Console.WriteLine("Transação realizada com sucesso!");
                     break;
                 case "2":
-                    transacoes.Remove(despesas); 
+                    transacoes.Remove(transacao); 
                     transacao.Saldo += valor; 
                     Console.WriteLine("Transação cancelada!");
                     break;
                 default:
                     Console.WriteLine("Opção inválida. Transação cancelada.");
-                    transacoes.Remove(despesas); 
+                    transacoes.Remove(transacao); 
                     transacao.Saldo += valor; 
                     break;
             }
@@ -247,20 +243,20 @@ namespace GerenciadorFinancasPessoais
             
         }
 
-        public static void MostrarSaldoConta(List<Transacao> transacoes)
+        public static void MostrarSaldoConta(List<Transacao> transacoes, double saldoInicial)
         {
             Console.Clear();
             Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
 
-            double saldo = 10000;
+            saldoInicial = 10000;
 
             foreach (Transacao transacao in transacoes)
             {
-                saldo -= transacao.Valor; 
+                saldoInicial -= transacao.Valor;
             }
 
             Console.WriteLine("\n-------------------------------------------------");
-            Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
+            Console.WriteLine($"Saldo total da conta: {saldoInicial.ToString("C")}");
             Console.WriteLine("-------------------------------------------------\n");
 
             Cor("azul");
@@ -270,7 +266,7 @@ namespace GerenciadorFinancasPessoais
         }
 
 
-        static void ProcessarOpcaoMenu(string opcao, string nome, List<Transacao> transacoes)
+        static void ProcessarOpcaoMenu(string opcao, string nome, List<Transacao> transacoes, double saldoInicial)
         {
             switch (opcao)
             {
@@ -281,7 +277,7 @@ namespace GerenciadorFinancasPessoais
                     MostrarTransacoes(transacoes);
                     break;
                 case "3":
-                    MostrarSaldoConta(transacoes);
+                    MostrarSaldoConta(transacoes, saldoInicial);
                     break;
                 case "4":
                 case "5":
@@ -295,3 +291,4 @@ namespace GerenciadorFinancasPessoais
         }
     }
 }
+

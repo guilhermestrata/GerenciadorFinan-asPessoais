@@ -1,14 +1,18 @@
 ﻿
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Transactions;
 using System.Xml;
+using GerenciadorFinancasPessoais.Models;
 
 namespace GerenciadorFinancasPessoais
 {
     public class Program
     {
         static void Main(string[] args)
-        {
+         {
+            List<Transacao> listaDeTransacoes = new List<Transacao>();
+
             Transacao transacao = new Transacao();
 
             try
@@ -17,7 +21,7 @@ namespace GerenciadorFinancasPessoais
                 string nome = Console.ReadLine();
                 transacao.Nome = nome;
             }
-            catch (FormatException e )
+            catch (FormatException e)
             {
                 Cor("vermelha");
                 Console.WriteLine(e.Message);
@@ -37,11 +41,10 @@ namespace GerenciadorFinancasPessoais
 
             do
             {
-                Console.WriteLine(MostrarCabecalho());
                 Console.WriteLine(MostrarMenu());
 
                 opcao = LerOpcaoMenu();
-                ProcessarOpcaoMenu(opcao, transacao.Nome);
+                ProcessarOpcaoMenu(opcao, transacao.Nome, listaDeTransacoes);
                 PressionaTecla();
                 Console.Clear();
 
@@ -51,7 +54,9 @@ namespace GerenciadorFinancasPessoais
 
         static string BemVindo(Transacao transacao)
         {
-            string bv = $"BOAS VINDAS {transacao.Nome}!\n";
+            string bv = $"\nBem-vindo ao Gerenciador de Finanças {transacao.Nome}\n" +
+                        $"Como posso ajudá-lo hoje?";
+
             return bv;
         }
 
@@ -60,18 +65,13 @@ namespace GerenciadorFinancasPessoais
             string menu = "\nEscolha uma opção: \n" +
                             "1 - Realizar uma transação \n" +
                             "2 - Visualizar transações \n" +
-                            "3 - Gerar relatórios \n" +
+                            "3 - Mostrar saldo total \n" +
                             "4 - Gerenciar categorias \n" +
                             "5 - Configurações \n" +
                             "6 - Sair \n";
             return menu;
         }
         
-        static string MostrarCabecalho()
-        {
-            string cabecalho = "\nGERENCIADOR DE FINANÇAS PESSOAIS";
-            return cabecalho;
-        }
 
         static string LerOpcaoMenu()
         {
@@ -95,6 +95,9 @@ namespace GerenciadorFinancasPessoais
                 case "vermelha":
                     corConsole = ConsoleColor.Red;
                     break;
+                case "azul":
+                    corConsole = ConsoleColor.Cyan;
+                    break;
                 default:
                     corConsole = ConsoleColor.White;
                     break;
@@ -110,20 +113,19 @@ namespace GerenciadorFinancasPessoais
         }
         
 
-        public static void RealizarTransacao(string nome)
+        public static void RealizarTransacao(string nome, List<Transacao> transacoes)
         {
             Console.Clear();
             Console.WriteLine("REALIZAR TRANSAÇÃO\n");
-            Console.WriteLine("Tipo de transação:\n" +
-                                "1 - DESPESAS\n" +
-                                "2 - RECEITA");
+            Console.WriteLine("[ 1 - DESPESAS ]\n" + "[ 2 - RECEITA  ]\n \n");
+            Console.Write("Tipo de transação: ");
 
             string tipo = Console.ReadLine();
 
             switch (tipo) 
             {
                 case "1":
-                    RealizarTransacaoDespesas(nome);
+                    RealizarTransacaoDespesas(nome, transacoes);
                     break;
                 case "2":
                     RealizarTransacaoReceita();
@@ -133,7 +135,40 @@ namespace GerenciadorFinancasPessoais
                     break;
             }
         }
-        public static void RealizarTransacaoDespesas(string nome)
+
+
+        public static void MostrarTransacoes(List<Transacao> transacoes)
+        {
+            Console.Clear();
+            Console.WriteLine("::::::::::::::::: LISTA DE TRANSAÇÕES :::::::::::::::::");
+
+            foreach (var transacao in transacoes)
+            {
+                Cor("azul");
+                Console.WriteLine($"\nTipo: {transacao.Tipo}");
+                Console.WriteLine($"Valor: {transacao.Valor}");
+                Console.WriteLine($"Descrição: {transacao.Descricao}");
+                Console.WriteLine($"Data: {transacao.Data}\n");
+                Console.WriteLine("---------------------------------------");
+                Cor("branca");
+            }
+            
+
+
+
+            if (transacoes.Count() == 0) 
+            {
+                Cor("vermelha");
+                Console.WriteLine("\nNENHUMA TRANSAÇÃO REGISTRADA\n");
+                Cor("branca");
+            }
+
+
+            Console.WriteLine("Pressione qualquer tecla para voltar ao menu.");
+            Console.ReadKey();
+        }
+
+        public static void RealizarTransacaoDespesas(string nome, List<Transacao> transacoes) // MENU 1
         {
             double valor;
             string finalizar;
@@ -143,13 +178,14 @@ namespace GerenciadorFinancasPessoais
             Console.WriteLine("Tipo de Transação: Despesas\n");
 
             Transacao despesas = new Transacao();
+
             despesas.Tipo = TipoTransacao.Despesa;
 
             Console.Write("Qual valor a ser transferido {0}? : ", nome);
             try
             {
-            valor = double.Parse(Console.ReadLine());
-            despesas.Valor = valor;
+                valor = double.Parse(Console.ReadLine());
+                despesas.Valor = valor;
             }
             catch (FormatException e)
             {
@@ -162,6 +198,8 @@ namespace GerenciadorFinancasPessoais
             despesas.Descricao = Console.ReadLine();
             
             despesas.Data = DateTime.Now;
+
+            transacoes.Add(despesas);
 
             Console.WriteLine("1 - [CONFIRMAR]\n" +
                             "2 - [CANCELAR]");
@@ -189,15 +227,38 @@ namespace GerenciadorFinancasPessoais
             
         }
 
-        static void ProcessarOpcaoMenu(string opcao, string nome)
+        public static void MostrarSaldoConta(List<Transacao> transacoes)
+        {
+            Console.Clear();
+            Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
+
+            double saldoTotal = 0;
+            foreach (Transacao transacao in transacoes)
+            {
+                saldoTotal += transacao.Valor;
+            }
+
+            Console.WriteLine($"Saldo total da conta: {saldoTotal}");
+
+            Console.WriteLine("Pressione qualquer tecla para voltar ao menu.");
+            Console.ReadKey();
+
+        }
+        
+
+        static void ProcessarOpcaoMenu(string opcao, string nome, List<Transacao> transacoes)
         {
             switch (opcao)
             {
                 case "1":
-                    RealizarTransacao(nome);
+                    RealizarTransacao(nome, transacoes);
                     break;
                 case "2":
+                    MostrarTransacoes(transacoes);
+                    break;
                 case "3":
+                    MostrarSaldoConta(transacoes);
+                    break;
                 case "4":
                 case "5":
                 case "6":

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GerenciadorFinancasPessoais
+namespace GerenciadorFinancasPessoais.Models
 {
     public enum TipoTransacao
     {
-        Despesa=0,
-        Receita=1
+        Despesa = 0,
+        Receita = 1
     }
 }

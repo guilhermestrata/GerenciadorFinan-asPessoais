@@ -1,4 +1,6 @@
 ﻿
+using System.Drawing;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Transactions;
@@ -117,7 +119,7 @@ namespace GerenciadorFinancasPessoais
         {
             Console.Clear();
             Console.WriteLine("REALIZAR TRANSAÇÃO\n");
-            Console.WriteLine("[ 1 - DESPESAS ]\n" + "[ 2 - RECEITA  ]\n \n");
+            Console.WriteLine("[ 1 - AGORA ]\n" + "[ 2 - AGENDAR]\n \n");
             Console.Write("Tipo de transação: ");
 
             string tipo = Console.ReadLine();
@@ -125,10 +127,10 @@ namespace GerenciadorFinancasPessoais
             switch (tipo) 
             {
                 case "1":
-                    RealizarTransacaoDespesas(nome, transacoes);
+                    RealizarTransacaoAgora(nome, transacoes);
                     break;
                 case "2":
-                    RealizarTransacaoReceita();
+                    RealizarTransacaoAgendada();
                     break;
                 default:
                     Console.WriteLine("Opção de transação inválida!");
@@ -168,24 +170,35 @@ namespace GerenciadorFinancasPessoais
             Console.ReadKey();
         }
 
-        public static void RealizarTransacaoDespesas(string nome, List<Transacao> transacoes) // MENU 1
+        public static void RealizarTransacaoAgora(string nome, List<Transacao> transacoes)
         {
             double valor;
             string finalizar;
 
+            Transacao transacao = new Transacao();
+            transacao.Saldo = 10000; 
+
             Console.Clear();
             Console.WriteLine("=== REALIZAR TRANSAÇÃO ===\n");
+
+            Cor("azul");
             Console.WriteLine("Tipo de Transação: Despesas\n");
+            Cor("branca");
 
             Transacao despesas = new Transacao();
-
             despesas.Tipo = TipoTransacao.Despesa;
 
             Console.Write("Qual valor a ser transferido {0}? : ", nome);
+
             try
             {
                 valor = double.Parse(Console.ReadLine());
+                if (valor > transacao.Saldo)
+                {
+                    throw new FormatException("Sem saldo disponível");
+                }
                 despesas.Valor = valor;
+                transacao.Saldo -= valor; 
             }
             catch (FormatException e)
             {
@@ -194,15 +207,18 @@ namespace GerenciadorFinancasPessoais
                 Console.ReadKey();
                 return;
             }
+
             Console.Write("Descrição da transação: ");
             despesas.Descricao = Console.ReadLine();
-            
+
             despesas.Data = DateTime.Now;
 
             transacoes.Add(despesas);
 
-            Console.WriteLine("1 - [CONFIRMAR]\n" +
-                            "2 - [CANCELAR]");
+            Console.WriteLine("\nConfirmar Transação:");
+            Console.WriteLine("1 - [Confirmar]");
+            Console.WriteLine("2 -  [Cancelar]");
+
             finalizar = Console.ReadLine();
 
             switch (finalizar)
@@ -211,18 +227,22 @@ namespace GerenciadorFinancasPessoais
                     Console.WriteLine("Transação realizada com sucesso!");
                     break;
                 case "2":
-                    Console.ReadKey();
+                    transacoes.Remove(despesas); 
+                    transacao.Saldo += valor; 
+                    Console.WriteLine("Transação cancelada!");
                     break;
                 default:
-                    Console.WriteLine("Opção inválida");
+                    Console.WriteLine("Opção inválida. Transação cancelada.");
+                    transacoes.Remove(despesas); 
+                    transacao.Saldo += valor; 
                     break;
             }
 
             Console.WriteLine("Pressione qualquer tecla para prosseguir");
             Console.ReadKey();
-
         }
-        public static void RealizarTransacaoReceita()
+
+        public static void RealizarTransacaoAgendada()
         {
             
         }
@@ -232,19 +252,23 @@ namespace GerenciadorFinancasPessoais
             Console.Clear();
             Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
 
-            double saldoTotal = 0;
+            double saldo = 10000;
+
             foreach (Transacao transacao in transacoes)
             {
-                saldoTotal += transacao.Valor;
+                saldo -= transacao.Valor; 
             }
 
-            Console.WriteLine($"Saldo total da conta: {saldoTotal}");
+            Console.WriteLine("\n-------------------------------------------------");
+            Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
+            Console.WriteLine("-------------------------------------------------\n");
 
-            Console.WriteLine("Pressione qualquer tecla para voltar ao menu.");
+            Cor("azul");
+            Console.WriteLine("\nPressione qualquer tecla para voltar ao menu.");
+            Cor("branca");
             Console.ReadKey();
-
         }
-        
+
 
         static void ProcessarOpcaoMenu(string opcao, string nome, List<Transacao> transacoes)
         {

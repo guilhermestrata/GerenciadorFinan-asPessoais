@@ -14,27 +14,25 @@ namespace GerenciadorFinancasPessoais.Models
         private TipoTransacao _tipo;
         private string _destinatario;
         private string _codigo;
+        private double _saldo;
 
-        public double Valor
+        public double Saldo
         {
             get
             {
-                return Math.Round(_valor, 2);
+                return Math.Round(_saldo, 2);
             }
             set
             {
-                if (value < 0.01)
+                if (value < 0)
                 {
-                    throw new FormatException("A quantia deve ser no mínimo de 0,01 centavos");
+                    throw new FormatException("Sem saldo disponível");
                 }
-                if (value > 1000000)
-                {
-                    throw new FormatException("O sistema não permite transações com um valor acima de 1 milhão");
-                }
-
-                _valor = value;
+                _saldo = value;
             }
         }
+
+        public double Valor { get; set; }
 
         public string Nome
         {

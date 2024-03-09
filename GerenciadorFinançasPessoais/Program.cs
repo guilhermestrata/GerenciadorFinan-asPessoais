@@ -16,7 +16,6 @@ namespace GerenciadorFinancasPessoais
             List<Transacao> listaDeTransacoes = new List<Transacao>();
 
             Transacao transacao = new Transacao();
-
             try
             {
                 Console.Write("Digite o nome do proprietário: ");
@@ -176,7 +175,8 @@ namespace GerenciadorFinancasPessoais
             string finalizar;
 
             Transacao transacao = new Transacao();
-            transacao.Saldo = 10000; 
+
+            transacao.Saldo = 10000;
 
             Console.Clear();
             Console.WriteLine("=== REALIZAR TRANSAÇÃO ===\n");
@@ -194,6 +194,7 @@ namespace GerenciadorFinancasPessoais
                 valor = double.Parse(Console.ReadLine());
                 transacao.Valor = valor;
                 transacao.Saldo -= transacao.Valor;
+                Console.WriteLine(transacao.Saldo);
             }
             catch (FormatException e)
             {
@@ -243,20 +244,29 @@ namespace GerenciadorFinancasPessoais
             
         }
 
-        public static void MostrarSaldoConta(List<Transacao> transacoes, double saldoInicial)
+        public static void CalcularSaldo(List<Transacao> transacoes)
+        {
+            Transacao transacao = new Transacao();
+
+            transacao.Saldo = 10000;
+            foreach (Transacao t in transacoes)
+            {
+                transacao.Saldo -= transacao.Valor;
+            }
+            double saldo = transacao.Saldo;
+            Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
+        }
+
+        public static void MostrarSaldoConta(List<Transacao> transacoes)
         {
             Console.Clear();
             Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
 
-            saldoInicial = 10000;
+            Transacao t = new Transacao();
 
-            foreach (Transacao transacao in transacoes)
-            {
-                saldoInicial -= transacao.Valor;
-            }
 
             Console.WriteLine("\n-------------------------------------------------");
-            Console.WriteLine($"Saldo total da conta: {saldoInicial.ToString("C")}");
+            CalcularSaldo(transacoes);
             Console.WriteLine("-------------------------------------------------\n");
 
             Cor("azul");
@@ -277,7 +287,7 @@ namespace GerenciadorFinancasPessoais
                     MostrarTransacoes(transacoes);
                     break;
                 case "3":
-                    MostrarSaldoConta(transacoes, saldoInicial);
+                    MostrarSaldoConta(transacoes);
                     break;
                 case "4":
                 case "5":

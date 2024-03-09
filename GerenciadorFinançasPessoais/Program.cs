@@ -175,8 +175,7 @@ namespace GerenciadorFinancasPessoais
             double valor;
             string finalizar;
 
-            Transacao transacao = new Transacao();
-            transacao.Saldo = 10000; 
+            double saldo = transacoes.Any() ? transacoes.Last().Saldo : Transacao.SaldoInicial;
 
             Console.Clear();
             Console.WriteLine("=== REALIZAR TRANSAÇÃO ===\n");
@@ -185,6 +184,8 @@ namespace GerenciadorFinancasPessoais
             Console.WriteLine("Tipo de Transação: Despesas\n");
             Cor("branca");
 
+            Transacao transacao = new Transacao(); 
+
             transacao.Tipo = TipoTransacao.Despesa;
 
             Console.Write("Qual valor a ser transferido {0}? : ", nome);
@@ -192,8 +193,22 @@ namespace GerenciadorFinancasPessoais
             try
             {
                 valor = double.Parse(Console.ReadLine());
-                transacao.Valor = valor;
-                transacao.Saldo -= transacao.Valor;
+
+                if (valor > saldo)
+                {
+                    Console.WriteLine("Transação excede o saldo disponível. O valor foi ajustado para {0:C}.", saldo);
+                    valor = saldo;
+                }
+
+                transacao.Valor = valor; 
+                transacao.Saldo = saldo - valor; 
+
+                Console.Write("Descrição da transação: ");
+                transacao.Descricao = Console.ReadLine();
+
+                transacao.Data = DateTime.Now;
+
+                transacoes.Add(transacao); 
             }
             catch (FormatException e)
             {
@@ -204,16 +219,9 @@ namespace GerenciadorFinancasPessoais
                 return;
             }
 
-            Console.Write("Descrição da transação: ");
-            transacao.Descricao = Console.ReadLine();
-
-            transacao.Data = DateTime.Now;
-
-            transacoes.Add(transacao);
-
             Console.WriteLine("\nConfirmar Transação:");
             Console.WriteLine("1 - [Confirmar]");
-            Console.WriteLine("2 -  [Cancelar]");
+            Console.WriteLine("2 - [Cancelar]");
 
             finalizar = Console.ReadLine();
 
@@ -223,14 +231,14 @@ namespace GerenciadorFinancasPessoais
                     Console.WriteLine("Transação realizada com sucesso!");
                     break;
                 case "2":
-                    transacoes.Remove(transacao); 
-                    transacao.Saldo += valor; 
+                    transacoes.Remove(transacao);
+                    transacao.Saldo += valor;
                     Console.WriteLine("Transação cancelada!");
                     break;
                 default:
                     Console.WriteLine("Opção inválida. Transação cancelada.");
-                    transacoes.Remove(transacao); 
-                    transacao.Saldo += valor; 
+                    transacoes.Remove(transacao);
+                    transacao.Saldo += valor;
                     break;
             }
 
@@ -238,25 +246,26 @@ namespace GerenciadorFinancasPessoais
             Console.ReadKey();
         }
 
+
         public static void RealizarTransacaoAgendada()
         {
             
         }
 
-        public static void MostrarSaldoConta(List<Transacao> transacoes, double saldoInicial)
+        public static void MostrarSaldoConta(List<Transacao> transacoes)
         {
             Console.Clear();
             Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
 
-            saldoInicial = 10000;
+            double saldo = Transacao.SaldoInicial;
 
             foreach (Transacao transacao in transacoes)
             {
-                saldoInicial -= transacao.Valor;
+                saldo -= transacao.Valor;
             }
 
             Console.WriteLine("\n-------------------------------------------------");
-            Console.WriteLine($"Saldo total da conta: {saldoInicial.ToString("C")}");
+            Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
             Console.WriteLine("-------------------------------------------------\n");
 
             Cor("azul");
@@ -277,7 +286,7 @@ namespace GerenciadorFinancasPessoais
                     MostrarTransacoes(transacoes);
                     break;
                 case "3":
-                    MostrarSaldoConta(transacoes, saldoInicial);
+                    MostrarSaldoConta(transacoes);
                     break;
                 case "4":
                 case "5":

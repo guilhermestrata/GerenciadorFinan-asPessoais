@@ -15,6 +15,13 @@ namespace GerenciadorFinancasPessoais.Models
         private string _destinatario;
         private string _codigo;
         private double _saldo;
+        private static double _saldoInicial = 10000;
+
+        public static double SaldoInicial
+        {
+            get { return _saldoInicial; }
+            set { _saldoInicial = value; }
+        }
 
         public double Saldo
         {
@@ -28,7 +35,10 @@ namespace GerenciadorFinancasPessoais.Models
                 {
                     throw new FormatException("Sem saldo disponível");
                 }
-                _saldo = value;
+                else
+                {
+                    _saldo = value;
+                }
             }
         }
 

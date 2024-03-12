@@ -8,7 +8,7 @@ namespace GerenciadorFinancasPessoais.Models
 {
     public enum TipoTransacao
     {
-        Despesa = 0,
-        Receita = 1
+        Agora = 0,
+        Agendar = 1
     }
 }

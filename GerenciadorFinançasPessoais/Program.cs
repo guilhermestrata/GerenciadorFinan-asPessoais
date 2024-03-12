@@ -1,5 +1,6 @@
 ﻿
 using System.Drawing;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,17 +17,18 @@ namespace GerenciadorFinancasPessoais
             List<Transacao> listaDeTransacoes = new List<Transacao>();
 
             Transacao transacao = new Transacao();
+            Configuracoes configuracoes = new Configuracoes(); 
+
             try
             {
                 Console.Write("Digite o nome do proprietário: ");
                 string nome = Console.ReadLine();
                 transacao.Nome = nome;
             }
-            catch (FormatException e)
+            catch (ArgumentException e)
             {
                 Cor("vermelha");
                 Console.WriteLine(e.Message);
-
                 Cor("branca");
 
                 Console.WriteLine("\nPressione qualquer tecla para prosseguir");
@@ -34,7 +36,7 @@ namespace GerenciadorFinancasPessoais
                 return;
             }
 
-            Cor("verde");
+            Cor("azul");
             Console.WriteLine(BemVindo(transacao));
             Cor("branca");
 
@@ -45,12 +47,11 @@ namespace GerenciadorFinancasPessoais
                 Console.WriteLine(MostrarMenu());
 
                 opcao = LerOpcaoMenu();
-                ProcessarOpcaoMenu(opcao, transacao.Nome, listaDeTransacoes, transacao.Saldo);
+                ProcessarOpcaoMenu(opcao, transacao.Nome, listaDeTransacoes, configuracoes, transacao);
                 PressionaTecla();
                 Console.Clear();
 
             } while (opcao != "6");
-            
         }
 
         static string BemVindo(Transacao transacao)
@@ -63,13 +64,19 @@ namespace GerenciadorFinancasPessoais
 
         static string MostrarMenu()
         {
-            string menu = "\nEscolha uma opção: \n" +
-                            "1 - Realizar uma transação \n" +
-                            "2 - Visualizar transações \n" +
-                            "3 - Mostrar saldo total \n" +
-                            "4 - Gerenciar categorias \n" +
-                            "5 - Configurações \n" +
-                            "6 - Sair \n";
+            Cor("azul");
+            Console.WriteLine("\n-------------------------------------------------");
+            Console.WriteLine($"      GERENCIADOR DE FINANÇAS PESSOAIS      ");
+            Console.WriteLine("-------------------------------------------------\n");
+            Cor("branca");
+
+            string menu = "\nEscolha uma opção: \n\n" +
+                            "[1] - Realizar uma transação \n" +
+                            "[2] - Visualizar transações \n" +
+                            "[3] - Mostrar saldo total \n" +
+                            "[4] - Gerenciar categorias \n" +
+                            "[5] - Configurações \n" +
+                            "[6] - Sair \n";
             return menu;
         }
         
@@ -107,76 +114,23 @@ namespace GerenciadorFinancasPessoais
         }
 
 
+
         private static void PressionaTecla()
         {
+            Cor("azul");
             Console.WriteLine("Pressione qualquer tecla para prosseguir.");
+            Cor("branca");
             Console.ReadKey();
         }
         
-
-        public static void RealizarTransacao(string nome, List<Transacao> transacoes)
-        {
-            Console.Clear();
-            Console.WriteLine("REALIZAR TRANSAÇÃO\n");
-            Console.WriteLine("[ 1 - AGORA ]\n" + "[ 2 - AGENDAR]\n \n");
-            Console.Write("Tipo de transação: ");
-
-            string tipo = Console.ReadLine();
-
-            switch (tipo) 
-            {
-                case "1":
-                    RealizarTransacaoAgora(nome, transacoes);
-                    break;
-                case "2":
-                    RealizarTransacaoAgendada();
-                    break;
-                default:
-                    Console.WriteLine("Opção de transação inválida!");
-                    break;
-            }
-        }
-
-
-        public static void MostrarTransacoes(List<Transacao> transacoes)
-        {
-            Console.Clear();
-            Console.WriteLine("::::::::::::::::: LISTA DE TRANSAÇÕES :::::::::::::::::");
-
-            foreach (var transacao in transacoes)
-            {
-                Cor("azul");
-                Console.WriteLine($"\nTipo: {transacao.Tipo}");
-                Console.WriteLine($"Valor: {transacao.Valor}");
-                Console.WriteLine($"Descrição: {transacao.Descricao}");
-                Console.WriteLine($"Data: {transacao.Data}\n");
-                Console.WriteLine("---------------------------------------");
-                Cor("branca");
-            }
-            
-
-
-
-            if (transacoes.Count() == 0) 
-            {
-                Cor("vermelha");
-                Console.WriteLine("\nNENHUMA TRANSAÇÃO REGISTRADA\n");
-                Cor("branca");
-            }
-
-
-            Console.WriteLine("Pressione qualquer tecla para voltar ao menu.");
-            Console.ReadKey();
-        }
+        
 
         public static void RealizarTransacaoAgora(string nome, List<Transacao> transacoes)
         {
             double valor;
             string finalizar;
 
-            Transacao transacao = new Transacao();
-
-            transacao.Saldo = 10000;
+            double saldo = transacoes.Any() ? transacoes.Last().Saldo : Transacao.SaldoInicial;
 
             Console.Clear();
             Console.WriteLine("=== REALIZAR TRANSAÇÃO ===\n");
@@ -185,16 +139,33 @@ namespace GerenciadorFinancasPessoais
             Console.WriteLine("Tipo de Transação: Despesas\n");
             Cor("branca");
 
-            transacao.Tipo = TipoTransacao.Despesa;
+            Transacao transacao = new Transacao(); 
+
+            transacao.Tipo = TipoTransacao.Agora;
 
             Console.Write("Qual valor a ser transferido {0}? : ", nome);
 
             try
             {
                 valor = double.Parse(Console.ReadLine());
-                transacao.Valor = valor;
-                transacao.Saldo -= transacao.Valor;
-                Console.WriteLine(transacao.Saldo);
+
+                if (valor > saldo)
+                {
+                    Cor("vermelha");
+                    Console.WriteLine("Transação excede o saldo disponível. O valor foi ajustado para {0:C}.\n", saldo);
+                    Cor("branca");
+                    valor = saldo;
+                }
+
+                transacao.Valor = valor; 
+                transacao.Saldo = saldo - valor; 
+
+                Console.Write("Descrição da transação: ");
+                transacao.Descricao = Console.ReadLine();
+
+                transacao.Data = DateTime.Now;
+
+                transacoes.Add(transacao); 
             }
             catch (FormatException e)
             {
@@ -205,16 +176,9 @@ namespace GerenciadorFinancasPessoais
                 return;
             }
 
-            Console.Write("Descrição da transação: ");
-            transacao.Descricao = Console.ReadLine();
-
-            transacao.Data = DateTime.Now;
-
-            transacoes.Add(transacao);
-
             Console.WriteLine("\nConfirmar Transação:");
             Console.WriteLine("1 - [Confirmar]");
-            Console.WriteLine("2 -  [Cancelar]");
+            Console.WriteLine("2 - [Cancelar]");
 
             finalizar = Console.ReadLine();
 
@@ -224,49 +188,110 @@ namespace GerenciadorFinancasPessoais
                     Console.WriteLine("Transação realizada com sucesso!");
                     break;
                 case "2":
-                    transacoes.Remove(transacao); 
-                    transacao.Saldo += valor; 
+                    transacoes.Remove(transacao);
+                    transacao.Saldo += valor;
                     Console.WriteLine("Transação cancelada!");
                     break;
                 default:
                     Console.WriteLine("Opção inválida. Transação cancelada.");
-                    transacoes.Remove(transacao); 
-                    transacao.Saldo += valor; 
+                    transacoes.Remove(transacao);
+                    transacao.Saldo += valor;
                     break;
             }
-
             Console.WriteLine("Pressione qualquer tecla para prosseguir");
             Console.ReadKey();
         }
 
-        public static void RealizarTransacaoAgendada()
+
+        public static void RealizarTransacaoAgendada(string nome, List<Transacao> transacoes)
         {
-            
+            double valor;
+            string finalizar;
+
+            double saldo = transacoes.Any() ? transacoes.Last().Saldo : Transacao.SaldoInicial;
+
+            Console.Clear();
+            Console.WriteLine("=== REALIZAR TRANSAÇÃO ===\n");
+            Cor("azul");
+            Console.WriteLine("Tipo de Transação: Agendada\n");
+            Cor("branca");
+
+            Transacao transacao = new Transacao();
+
+            transacao.Tipo = TipoTransacao.Agendar;
+
+            Console.Write($"Qual valor da transação agendada {nome}? ");
+
+            try
+            {
+                valor = double.Parse(Console.ReadLine());
+
+                if (valor > saldo)
+                {
+                    Console.WriteLine("Transação agendada excede o saldo disponível.\n O valor foi ajustado para {0:C}.", saldo);
+                    valor = saldo;
+                }
+
+                transacao.Valor = valor;
+                transacao.Saldo = saldo - valor;
+
+                Console.Write("Para quando deseja agendar a transação (DD/MM/AAAA HH:mm)? ");
+                string dataHoraString = Console.ReadLine();
+
+                DateTime dataHora;
+                if (!DateTime.TryParseExact(dataHoraString, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataHora))
+                {
+                    throw new FormatException("Formato de data/hora inválido. Use o formato DD/MM/AAAA HH:mm.");
+                }
+
+                // Simulação de espera até a data agendada
+                while (DateTime.Now < dataHora)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                transacao.Data = dataHora;
+                transacoes.Add(transacao);
+
+                Cor("verde");
+                Console.WriteLine("Transação agendada realizada com sucesso!");
+                Cor("branca");
+            }
+            catch (FormatException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Pressione qualquer tecla para prosseguir");
+                Console.ReadKey();
+                return;
+            }
         }
+
 
         public static void CalcularSaldo(List<Transacao> transacoes)
         {
-            Transacao transacao = new Transacao();
+          double saldo = Transacao.SaldoInicial;
 
-            transacao.Saldo = 10000;
-            foreach (Transacao t in transacoes)
-            {
-                transacao.Saldo -= transacao.Valor;
-            }
-            double saldo = transacao.Saldo;
-            Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
+          foreach (Transacao transacao in transacoes)
+          {
+              saldo -= transacao.Valor;
+          }
+
+          Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
         }
 
         public static void MostrarSaldoConta(List<Transacao> transacoes)
         {
+            double saldo = Transacao.SaldoInicial;
+
+            foreach (Transacao transacao in transacoes)
+            {
+                saldo -= transacao.Valor;
+            }
+
             Console.Clear();
             Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
-
-            Transacao t = new Transacao();
-
-
             Console.WriteLine("\n-------------------------------------------------");
-            CalcularSaldo(transacoes);
+            Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
             Console.WriteLine("-------------------------------------------------\n");
 
             Cor("azul");
@@ -276,21 +301,25 @@ namespace GerenciadorFinancasPessoais
         }
 
 
-        static void ProcessarOpcaoMenu(string opcao, string nome, List<Transacao> transacoes, double saldoInicial)
+
+        static void ProcessarOpcaoMenu(string opcao, string nome, List<Transacao> transacoes, Configuracoes configuracoes, Transacao transacao)
         {
+
             switch (opcao)
             {
                 case "1":
-                    RealizarTransacao(nome, transacoes);
+                    transacao.RealizarTransacao(nome, transacoes);
                     break;
                 case "2":
-                    MostrarTransacoes(transacoes);
+                    transacao.MostrarTransacoes(transacoes);
                     break;
                 case "3":
                     MostrarSaldoConta(transacoes);
                     break;
                 case "4":
                 case "5":
+                    configuracoes.Config();
+                    break;
                 case "6":
                     Console.WriteLine($"Ainda trabalhando nessa opção {nome}!");
                     break;
@@ -301,4 +330,3 @@ namespace GerenciadorFinancasPessoais
         }
     }
 }
-

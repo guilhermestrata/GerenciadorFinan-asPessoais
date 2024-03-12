@@ -41,5 +41,5 @@ Este projeto é licenciado sob a [MIT License](LICENSE).
 ---
 
 <div align="center">
-  <b>Feito com ❤️ pelo seu-nome</b>
+  <b>Guilherme Arendt</b>
 </div>

@@ -17,7 +17,7 @@ namespace GerenciadorFinancasPessoais
             List<Transacao> listaDeTransacoes = new List<Transacao>();
 
             Transacao transacao = new Transacao();
-            Configuracoes configuracoes = new Configuracoes();  
+            Configuracoes configuracoes = new Configuracoes(); 
 
             try
             {
@@ -52,7 +52,6 @@ namespace GerenciadorFinancasPessoais
                 Console.Clear();
 
             } while (opcao != "6");
-            
         }
 
         static string BemVindo(Transacao transacao)
@@ -113,6 +112,7 @@ namespace GerenciadorFinancasPessoais
             }
             Console.ForegroundColor = corConsole;
         }
+
 
 
         private static void PressionaTecla()
@@ -232,8 +232,8 @@ namespace GerenciadorFinancasPessoais
                     valor = saldo;
                 }
 
-                transacao.Valor = valor; 
-                transacao.Saldo = saldo - valor; 
+                transacao.Valor = valor;
+                transacao.Saldo = saldo - valor;
 
                 Console.Write("Para quando deseja agendar a transação (DD/MM/AAAA HH:mm)? ");
                 string dataHoraString = Console.ReadLine();
@@ -243,12 +243,14 @@ namespace GerenciadorFinancasPessoais
                 {
                     throw new FormatException("Formato de data/hora inválido. Use o formato DD/MM/AAAA HH:mm.");
                 }
+
+                // Simulação de espera até a data agendada
                 while (DateTime.Now < dataHora)
                 {
                     Thread.Sleep(1000);
                 }
 
-                transacao.Data = dataHora; 
+                transacao.Data = dataHora;
                 transacoes.Add(transacao);
 
                 Cor("verde");
@@ -264,11 +266,21 @@ namespace GerenciadorFinancasPessoais
             }
         }
 
+
+        public static void CalcularSaldo(List<Transacao> transacoes)
+        {
+          double saldo = Transacao.SaldoInicial;
+
+          foreach (Transacao transacao in transacoes)
+          {
+              saldo -= transacao.Valor;
+          }
+
+          Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
+        }
+
         public static void MostrarSaldoConta(List<Transacao> transacoes)
         {
-            Console.Clear();
-            Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
-
             double saldo = Transacao.SaldoInicial;
 
             foreach (Transacao transacao in transacoes)
@@ -276,6 +288,8 @@ namespace GerenciadorFinancasPessoais
                 saldo -= transacao.Valor;
             }
 
+            Console.Clear();
+            Console.WriteLine(":::::::::::: SALDO TOTAL DA CONTA ::::::::::::");
             Console.WriteLine("\n-------------------------------------------------");
             Console.WriteLine($"Saldo total da conta: {saldo.ToString("C")}");
             Console.WriteLine("-------------------------------------------------\n");

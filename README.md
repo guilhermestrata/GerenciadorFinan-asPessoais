@@ -3,7 +3,6 @@
   <p>
     <b>Controle suas finanças de forma fácil e intuitiva!</b>
   </p>
-  <img src="https://placehold.it/300" alt="Gerenciador de Finanças Pessoais">
 </div>
 
 ## ℹ️ Sobre o Projeto

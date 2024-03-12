@@ -9,9 +9,9 @@ namespace GerenciadorFinancasTeste.Exceptions
         {
             var transacao = new Transacao();
 
-            var exception = Assert.Throws<FormatException>(() => (transacao.Nome = "Gu"));
+            var exception = Assert.Throws<ArgumentException>(() => (transacao.Nome = "Gu"));
 
-            Assert.Equal("O nome deve ser apresentado com 3 ou mais caracteres", exception.Message);
+            Assert.Equal("O nome deve conter pelo menos 3 caracteres.", exception.Message);
         }
 
         [Fact]
@@ -20,9 +20,9 @@ namespace GerenciadorFinancasTeste.Exceptions
         {
             var transacao = new Transacao();
 
-            var exception = Assert.Throws<FormatException>(() => transacao.Destinatario = "Gu");
+            var exception = Assert.Throws<ArgumentException>(() => transacao.Destinatario = "Gu");
 
-            Assert.Equal("O nome deve conter mais do que 3 caracteres", exception.Message);
+            Assert.Equal("O nome do destinatário deve conter pelo menos 3 caracteres.", exception.Message);
         }
     }
 }

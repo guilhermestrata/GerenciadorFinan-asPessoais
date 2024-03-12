@@ -25,7 +25,7 @@ namespace GerenciadorFinancasPessoais
                 string nome = Console.ReadLine();
                 transacao.Nome = nome;
             }
-            catch (FormatException e)
+            catch (ArgumentException e)
             {
                 Cor("vermelha");
                 Console.WriteLine(e.Message);

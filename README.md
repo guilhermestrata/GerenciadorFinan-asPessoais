@@ -19,8 +19,8 @@ O Gerenciador de Finanças Pessoais é uma aplicação console em C# que permite
 
 ## 🚀 Como Usar
 
-1. **Clone o Repositório**: `git clone https://github.com/seu-usuario/gerenciador-financas-pessoais.git`
-2. **Navegue até o Diretório**: `cd gerenciador-financas-pessoais`
+1. **Clone o Repositório**: `git clone https://github.com/guilhermestrata/GerenciadorFinancasPessoais.git`
+2. **Navegue até o Diretório**: `cd GerenciadorFinancasPessoais`
 3. **Compile o Projeto**: `dotnet build`
 4. **Execute o Projeto**: `dotnet run`
 

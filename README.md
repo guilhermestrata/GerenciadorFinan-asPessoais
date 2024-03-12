@@ -1,8 +1,16 @@
-# Gerenciador de Finanças Pessoais
+<div align="center">
+  <h1>Gerenciador de Finanças Pessoais</h1>
+  <p>
+    <b>Controle suas finanças de forma fácil e intuitiva!</b>
+  </p>
+  <img src="https://placehold.it/300" alt="Gerenciador de Finanças Pessoais">
+</div>
+
+## ℹ️ Sobre o Projeto
 
 O Gerenciador de Finanças Pessoais é uma aplicação console em C# que permite aos usuários realizar o controle de suas transações financeiras pessoais, incluindo despesas, receitas e saldos.
 
-## Funcionalidades
+## ⚙️ Funcionalidades
 
 - **Realizar uma transação**: Permite ao usuário registrar uma transação financeira, seja uma despesa imediata ou uma transação agendada para o futuro.
 - **Visualizar transações**: Exibe uma lista das transações registradas, incluindo detalhes como valor, descrição e data.
@@ -10,14 +18,14 @@ O Gerenciador de Finanças Pessoais é uma aplicação console em C# que permite
 - **Gerenciar categorias**: (A ser implementado)
 - **Configurações**: (A ser implementado)
 
-## Como usar
+## 🚀 Como Usar
 
-1. **Clone o repositório**: `git clone https://github.com/seu-usuario/gerenciador-financas-pessoais.git`
-2. **Navegue até o diretório**: `cd gerenciador-financas-pessoais`
-3. **Compile o projeto**: `dotnet build`
-4. **Execute o projeto**: `dotnet run`
+1. **Clone o Repositório**: `git clone https://github.com/seu-usuario/gerenciador-financas-pessoais.git`
+2. **Navegue até o Diretório**: `cd gerenciador-financas-pessoais`
+3. **Compile o Projeto**: `dotnet build`
+4. **Execute o Projeto**: `dotnet run`
 
-## Contribuindo
+## 🤝 Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue para relatar problemas ou sugerir melhorias. Se desejar contribuir com código, por favor siga estas etapas:
 
@@ -27,6 +35,12 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue para r
 4. Faça o push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
-## Licença
+## 📝 Licença
 
 Este projeto é licenciado sob a [MIT License](LICENSE).
+
+---
+
+<div align="center">
+  <b>Feito com ❤️ pelo seu-nome</b>
+</div>
